@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Santinvest | Simulador de Crescimento Patrimonial ENEF 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        :root {
+            --sant-blue-dark: #002d4f;
+            --sant-blue: #004a80;
+            --sant-blue-light: #0b6fa4;
+            --sant-gold: #C5A059;
+            --sant-gold-soft: #f4ead4;
+            --success: #15803d;
+            --danger: #dc2626;
+            --warning: #d97706;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background:
+                radial-gradient(circle at top left, rgba(197,160,89,0.12), transparent 28%),
+                radial-gradient(circle at top right, rgba(0,74,128,0.12), transparent 30%),
+                #f8fafc;
+            color: #0f172a;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .bg-santinvest {
+            background:
+                linear-gradient(135deg, rgba(0,45,79,0.98) 0%, rgba(0,74,128,0.96) 62%, rgba(11,111,164,0.94) 100%);
+        }
+
+        .text-gold { color: var(--sant-gold); }
+        .border-gold { border-color: var(--sant-gold); }
+        .bg-gold { background-color: var(--sant-gold); }
+
+        .btn-gold {
+            background: linear-gradient(135deg, #C5A059 0%, #d9b86d 100%);
+            transition: transform .25s ease, box-shadow .25s ease, filter .25s ease;
+        }
+
+        .btn-gold:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 18px 35px -18px rgba(197,160,89,.9);
+            filter: brightness(1.04);
+        }
+
+        .sticky-header { position: sticky; top: 0; z-index: 50; }
+
+        .glass-card {
+            background: rgba(255,255,255,.92);
+            border: 1px solid rgba(148,163,184,.2);
+            box-shadow: 0 24px 70px -34px rgba(15,23,42,.55);
+            backdrop-filter: blur(16px);
+        }
+
+        .metric-card {
+            background: #ffffff;
+            border: 1px solid rgba(226,232,240,.95);
+            box-shadow: 0 8px 24px -18px rgba(15,23,42,.35);
+        }
+
+        .option-btn {
+            border: 1px solid #e2e8f0;
+            background: #ffffff;
+            transition: all .22s ease;
+        }
+
+        .option-btn:hover {
+            border-color: rgba(197,160,89,.75);
+            transform: translateY(-2px);
+            box-shadow: 0 16px 32px -24px rgba(15,23,42,.45);
+        }
+
+        .option-btn:active { transform: scale(.985); }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            border-radius: 999px;
+            padding: .35rem .7rem;
+            font-size: .72rem;
+            font-weight: 800;
+            letter-spacing: .03em;
+            text-transform: uppercase;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: .85rem;
+        }
+
+        @media (max-width: 640px) {
+            .game-text { font-size: 1.16rem; line-height: 1.35; }
+            .stat-label { font-size: .58rem; }
+            .stat-value { font-size: .84rem; }
+            .result-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="bg-white border-b-4 border-gold sticky-header shadow-sm">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+        <img src="logo-menu.png" alt="Santinvest" class="h-8 md:h-10" onerror="this.style.display='none'">
+        <div class="flex items-center gap-3">
+            <div class="hidden sm:block text-right">
+                <p class="text-[9px] md:text-[10px] font-extrabold text-slate-400 uppercase tracking-widest leading-none">Semana Nacional de</p>
+                <p class="text-[11px] md:text-xs font-extrabold text-blue-950">Educação Financeira 2026</p>
+            </div>
+            <div class="w-9 h-9 rounded-full bg-blue-950 text-white flex items-center justify-center shadow-sm">
+                <i class="fa-solid fa-chart-line text-gold text-sm"></i>
+            </div>
+        </div>
+    </div>
+</header>
+
+<nav id="stats-bar" class="bg-white/95 backdrop-blur-md shadow-md sticky top-[58px] md:top-[72px] z-40 hidden border-b">
+    <div class="container mx-auto px-4 py-2 grid grid-cols-4 gap-2 items-center max-w-5xl">
+        <div class="text-center">
+            <p class="stat-label text-[9px] text-slate-400 uppercase font-extrabold">Patrimônio</p>
+            <p id="balance" class="stat-value text-sm md:text-lg font-extrabold text-blue-950">R$ 25.000</p>
+        </div>
+        <div class="text-center border-x px-2 border-slate-100">
+            <p class="stat-label text-[9px] text-slate-400 uppercase font-extrabold">Investido</p>
+            <p id="invested" class="stat-value text-sm md:text-lg font-extrabold text-emerald-700">R$ 12.000</p>
+        </div>
+        <div class="text-center border-r px-2 border-slate-100">
+            <p class="stat-label text-[9px] text-slate-400 uppercase font-extrabold">Dívida</p>
+            <p id="debt" class="stat-value text-sm md:text-lg font-extrabold text-red-600">R$ 0</p>
+        </div>
+        <div class="text-center">
+            <p class="stat-label text-[9px] text-slate-400 uppercase font-extrabold">Progresso</p>
+            <p id="progress-text" class="stat-value text-sm md:text-lg font-extrabold text-slate-700">1/18</p>
+        </div>
+    </div>
+</nav>
+
+<main class="container mx-auto px-4 py-6 md:py-12">
+    <div id="game-container" class="max-w-4xl mx-auto">
+
+        <section id="intro-card" class="bg-santinvest rounded-[2rem] p-6 md:p-12 text-white shadow-2xl overflow-hidden relative">
+            <div class="absolute -right-16 -top-16 w-56 h-56 rounded-full bg-white/10"></div>
+            <div class="absolute -left-20 bottom-0 w-72 h-72 rounded-full bg-gold/10"></div>
+
+            <div class="relative z-10 grid md:grid-cols-[1.1fr_.9fr] gap-8 items-center">
+                <div>
+                    <span class="pill bg-white/10 text-gold border border-white/10 mb-5">
+                        <i class="fa-solid fa-seedling"></i> Jornada de patrimônio
+                    </span>
+                    <h1 class="text-3xl md:text-5xl font-extrabold mb-5 leading-tight">
+                        Simulador de Crescimento Patrimonial
+                    </h1>
+                    <p class="text-base md:text-lg text-slate-200 mb-7 leading-relaxed">
+                        Tome decisões financeiras ao longo de 18 etapas e veja como escolhas sobre reserva, crédito,
+                        investimentos, consumo, proteção e disciplina afetam seu patrimônio líquido ao longo do tempo.
+                    </p>
+
+                    <div class="grid grid-cols-3 gap-3 mb-8">
+                        <div class="bg-white/10 rounded-2xl p-3 border border-white/10">
+                            <p class="text-[10px] uppercase tracking-wider text-slate-300 font-bold">Início</p>
+                            <p class="font-extrabold text-lg">R$ 25 mil</p>
+                        </div>
+                        <div class="bg-white/10 rounded-2xl p-3 border border-white/10">
+                            <p class="text-[10px] uppercase tracking-wider text-slate-300 font-bold">Horizonte</p>
+                            <p class="font-extrabold text-lg">36 meses</p>
+                        </div>
+                        <div class="bg-white/10 rounded-2xl p-3 border border-white/10">
+                            <p class="text-[10px] uppercase tracking-wider text-slate-300 font-bold">Foco</p>
+                            <p class="font-extrabold text-lg">Decisão</p>
+                        </div>
+                    </div>
+
+                    <button onclick="startGame()" class="btn-gold w-full md:w-auto text-white px-10 py-4 rounded-full font-extrabold text-lg shadow-lg">
+                        Iniciar jornada patrimonial
+                    </button>
+                </div>
+
+                <div class="glass-card rounded-[1.7rem] p-5 text-slate-900">
+                    <p class="text-xs font-extrabold uppercase tracking-[.18em] text-slate-400 mb-4">Como será calculado</p>
+                    <div class="space-y-4">
+                        <div class="flex gap-3">
+                            <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-900 flex items-center justify-center"><i class="fa-solid fa-wallet"></i></div>
+                            <div>
+                                <p class="font-extrabold">Patrimônio líquido</p>
+                                <p class="text-sm text-slate-500">Caixa + investimentos + rendimentos - dívidas.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-3">
+                            <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center"><i class="fa-solid fa-arrows-spin"></i></div>
+                            <div>
+                                <p class="font-extrabold">Juros compostos</p>
+                                <p class="text-sm text-slate-500">Boas decisões ampliam os aportes e aceleram a curva.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-3">
+                            <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center"><i class="fa-solid fa-shield-halved"></i></div>
+                            <div>
+                                <p class="font-extrabold">Resiliência financeira</p>
+                                <p class="text-sm text-slate-500">Reserva, proteção e controle de risco evitam descapitalização.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="game-play" class="hidden glass-card rounded-[2rem] p-5 md:p-10 shadow-2xl">
+            <div class="mb-7">
+                <div class="flex justify-between items-center mb-2">
+                    <span id="phase-label" class="pill bg-blue-50 text-blue-900">Fase 1</span>
+                    <span id="month-label" class="text-xs font-extrabold text-slate-400 uppercase tracking-widest">Mês 1</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                    <div id="progress-bar" class="bg-gold h-2 rounded-full transition-all duration-500" style="width: 5%"></div>
+                </div>
+            </div>
+
+            <h3 id="scenario-title" class="text-[11px] font-extrabold text-gold uppercase tracking-[0.24em] mb-3"></h3>
+            <h2 id="scenario-desc" class="game-text text-xl md:text-3xl font-extrabold text-slate-950 mb-4 leading-tight"></h2>
+            <p id="scenario-context" class="text-sm md:text-base text-slate-500 mb-7 leading-relaxed"></p>
+
+            <div id="options-container" class="grid gap-4"></div>
+        </section>
+
+        <div id="modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
+            <div class="bg-white rounded-[2rem] max-w-md w-full p-6 md:p-8 shadow-2xl border-t-4 border-gold">
+                <div class="text-center">
+                    <div id="modal-icon" class="text-5xl mb-4"></div>
+                    <h4 id="modal-title" class="text-xl md:text-2xl font-extrabold text-slate-950 mb-2"></h4>
+                    <p id="modal-text" class="text-sm md:text-base text-slate-600 mb-6 leading-relaxed"></p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 mb-6">
+                    <div class="bg-slate-50 rounded-2xl p-3 border border-slate-100">
+                        <p class="text-[10px] uppercase font-extrabold text-slate-400">Impacto agora</p>
+                        <p id="modal-now" class="text-base font-extrabold text-slate-900"></p>
+                    </div>
+                    <div class="bg-slate-50 rounded-2xl p-3 border border-slate-100">
+                        <p class="text-[10px] uppercase font-extrabold text-slate-400">Efeito futuro</p>
+                        <p id="modal-future" class="text-base font-extrabold text-slate-900"></p>
+                    </div>
+                </div>
+
+                <button onclick="closeModal()" class="w-full bg-blue-950 text-white font-extrabold py-3.5 rounded-2xl hover:bg-blue-900 transition">
+                    Próxima decisão
+                </button>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer class="text-center py-8 px-4 text-slate-400 text-[10px] md:text-xs">
+    <p>© 2026 Santinvest — Semana ENEF. Educação financeira para decisões melhores, patrimônio mais forte e futuro menos improvisado.</p>
+</footer>
+
+<script>
+    const formatCurrency = (value) => value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
+
+    const scenarios = [
+        {
+            phase: 'Fundação', month: 1, title: 'Ponto de partida',
+            desc: 'Você inicia a jornada com R$ 25 mil de patrimônio líquido. Como organizar a largada?',
+            context: 'A primeira decisão define se o dinheiro vira estrutura financeira ou apenas sensação temporária de conforto.',
+            options: [
+                { text: 'Separar R$ 10 mil para reserva, R$ 8 mil para investimentos e manter R$ 7 mil em caixa.', cash: -8000, invested: 8000, debt: 0, monthly: 350, resilience: 10, risk: 0, msg: 'Excelente arquitetura inicial. Você criou liquidez, alocação produtiva e capacidade de aporte.', now: 'Investimento ativado', future: '+ aporte mensal' },
+                { text: 'Manter tudo parado na conta corrente para “ver depois”.', cash: 0, invested: 0, debt: 0, monthly: 0, resilience: -8, risk: 2, msg: 'Confortável no curto prazo, caro no longo prazo. Dinheiro parado perde poder de compra e tração.', now: 'Sem crescimento', future: 'Inflação corrói' }
+            ]
+        },
+        {
+            phase: 'Reserva', month: 3, title: 'Reserva de emergência',
+            desc: 'Surge a chance de comprar um item de desejo por R$ 4.500. O que você faz?',
+            context: 'A reserva não existe para sobrar dinheiro; ela existe para impedir que um imprevisto vire dívida.',
+            options: [
+                { text: 'Adiar a compra e reforçar a reserva em liquidez diária.', cash: 0, invested: 2500, debt: 0, monthly: 120, resilience: 12, risk: -1, msg: 'Disciplina cirúrgica. Você fortaleceu a base e aumentou a capacidade de investimento recorrente.', now: '+ R$ 2,5 mil investidos', future: '+ segurança' },
+                { text: 'Comprar agora, mesmo consumindo boa parte da reserva.', cash: -4500, invested: 0, debt: 0, monthly: -80, resilience: -15, risk: 3, msg: 'O prazer veio, mas a blindagem caiu. Patrimônio sem reserva é prédio bonito sem fundação.', now: '- R$ 4,5 mil caixa', future: '- margem mensal' }
+            ]
+        },
+        {
+            phase: 'Crédito', month: 5, title: 'Crédito pré-aprovado',
+            desc: 'O banco libera R$ 8 mil com juros de 2,4% ao mês para consumo.',
+            context: 'Crédito é ferramenta. Nas mãos certas, acelera. Nas erradas, cobra pedágio com juros compostos — e sem pedir licença.',
+            options: [
+                { text: 'Recusar o crédito e manter o plano de aportes.', cash: 0, invested: 0, debt: 0, monthly: 100, resilience: 8, risk: -1, msg: 'Decisão madura. Você evitou que juros trabalhassem contra sua curva patrimonial.', now: 'Dívida evitada', future: '+ fluxo mensal' },
+                { text: 'Contratar o crédito para consumo e parcelar em 24 meses.', cash: 8000, invested: 0, debt: 9700, monthly: -510, resilience: -20, risk: 5, msg: 'O caixa subiu artificialmente, mas a dívida entrou na sala. E ela cobra aluguel.', now: '+ caixa, + dívida', future: '- R$ 510/mês' }
+            ]
+        },
+        {
+            phase: 'Investimentos', month: 7, title: 'Queda de mercado',
+            desc: 'Sua carteira caiu 6% em um mês, mas os fundamentos continuam bons.',
+            context: 'Volatilidade não é sinônimo de prejuízo. Prejuízo nasce quando estratégia vira pânico.',
+            options: [
+                { text: 'Rebalancear e comprar gradualmente ativos descontados.', cash: -1500, invested: 1500, debt: 0, monthly: 80, resilience: 8, risk: 0, msg: 'Ótima leitura de ciclo. Você usou volatilidade como oportunidade, não como gatilho emocional.', now: '+ preço médio eficiente', future: '+ potencial de retorno' },
+                { text: 'Vender tudo para “não perder mais”.', cash: 0, invested: -1400, debt: 0, monthly: -70, resilience: -12, risk: 2, msg: 'Vender na baixa cristaliza a perda e enfraquece a disciplina. O mercado agradece sua doação involuntária.', now: 'Perda realizada', future: '- crescimento' }
+            ]
+        },
+        {
+            phase: 'Consumo', month: 9, title: 'Gastos invisíveis',
+            desc: 'Assinaturas, delivery e pequenas compras somam R$ 620 por mês.',
+            context: 'Nem todo vilão financeiro chega com capa preta. Alguns vêm em débito automático.',
+            options: [
+                { text: 'Cortar R$ 350 mensais e transformar em aporte automático.', cash: 0, invested: 0, debt: 0, monthly: 350, resilience: 10, risk: -1, msg: 'Movimento de alta performance. Você converteu vazamento em motor de patrimônio.', now: '+ R$ 350/mês', future: 'Bola de neve positiva' },
+                { text: 'Manter tudo pela conveniência.', cash: 0, invested: 0, debt: 0, monthly: -120, resilience: -6, risk: 1, msg: 'A conveniência cobra caro quando vira padrão. Pequenos gastos, grande erosão.', now: 'Sem ajuste', future: '- sobra mensal' }
+            ]
+        },
+        {
+            phase: 'Proteção', month: 11, title: 'Seguro e proteção familiar',
+            desc: 'Você pode contratar proteção por R$ 140/mês.',
+            context: 'Patrimônio também é gestão de risco. Crescer sem proteção é escalar sem corda.',
+            options: [
+                { text: 'Contratar proteção adequada ao orçamento.', cash: 0, invested: 0, debt: 0, monthly: -140, resilience: 15, risk: -3, msg: 'Boa governança pessoal. Você reduziu risco de ruptura financeira familiar.', now: '- R$ 140/mês', future: '+ proteção' },
+                { text: 'Ignorar. Isso é preocupação para depois.', cash: 0, invested: 0, debt: 0, monthly: 0, resilience: -10, risk: 3, msg: 'O problema do “depois” é que ele costuma chegar sem reunião de alinhamento.', now: 'Custo zero hoje', future: '+ exposição' }
+            ]
+        },
+        {
+            phase: 'Renda', month: 13, title: 'Aumento de renda',
+            desc: 'Você recebeu aumento líquido de R$ 900 por mês.',
+            context: 'O crescimento de renda só vira crescimento patrimonial quando não é sequestrado pelo padrão de vida.',
+            options: [
+                { text: 'Destinar 60% do aumento para aportes e 40% para qualidade de vida.', cash: 0, invested: 0, debt: 0, monthly: 540, resilience: 12, risk: -1, msg: 'Equilíbrio executivo. Você escalou patrimônio sem transformar vida financeira em monastério.', now: '+ R$ 540/mês', future: '+ aceleração' },
+                { text: 'Elevar o padrão de consumo em R$ 900 por mês.', cash: 0, invested: 0, debt: 0, monthly: -40, resilience: -8, risk: 2, msg: 'Lifestyle inflation detectado. O salário subiu, mas o patrimônio pediu demissão.', now: '+ conforto', future: 'baixo ganho real' }
+            ]
+        },
+        {
+            phase: 'Inflação', month: 15, title: 'Proteção do poder de compra',
+            desc: 'A inflação voltou a pressionar o orçamento e seus objetivos de longo prazo.',
+            context: 'Rentabilidade nominal impressiona. Rentabilidade real constrói patrimônio.',
+            options: [
+                { text: 'Ajustar parte da carteira para ativos atrelados à inflação.', cash: 0, invested: 1200, debt: 0, monthly: 70, resilience: 9, risk: -1, msg: 'Movimento técnico e bem calibrado. Você protegeu poder de compra sem abandonar diversificação.', now: '+ proteção real', future: '+ estabilidade' },
+                { text: 'Deixar tudo em aplicações de baixa remuneração.', cash: 0, invested: 0, debt: 0, monthly: -90, resilience: -8, risk: 1, msg: 'Aparentemente seguro, estruturalmente frágil. A inflação é silenciosa, mas tem apetite.', now: 'conforto aparente', future: '- poder de compra' }
+            ]
+        },
+        {
+            phase: 'Diversificação', month: 17, title: 'Risco Brasil e moeda',
+            desc: 'Você percebe que todo seu patrimônio está exposto ao mesmo país, moeda e ciclo econômico.',
+            context: 'Diversificação não é falta de convicção. É humildade estratégica diante de cenários incertos.',
+            options: [
+                { text: 'Alocar parte em ativos globais de forma gradual.', cash: -1000, invested: 1000, debt: 0, monthly: 80, resilience: 8, risk: -2, msg: 'Boa construção de fronteira eficiente. Você diluiu risco local e ampliou possibilidades.', now: '+ diversificação', future: '+ proteção cambial' },
+                { text: 'Concentrar tudo no que já conhece.', cash: 0, invested: 0, debt: 0, monthly: 0, resilience: -7, risk: 3, msg: 'Conhecer é bom. Concentrar demais é transformar conforto em fragilidade.', now: 'sem mudança', future: '+ risco concentrado' }
+            ]
+        },
+        {
+            phase: 'Impostos', month: 19, title: 'Organização fiscal',
+            desc: 'Chegou o período de declaração e revisão dos documentos financeiros.',
+            context: 'Eficiência fiscal não é detalhe operacional. É rentabilidade líquida com CPF organizado.',
+            options: [
+                { text: 'Organizar informes, deduções e registros de investimentos.', cash: 900, invested: 0, debt: 0, monthly: 40, resilience: 7, risk: -1, msg: 'Boa gestão. Restituição e controle fiscal viram vantagem operacional pessoal.', now: '+ R$ 900', future: '+ previsibilidade' },
+                { text: 'Deixar para a última hora e declarar no improviso.', cash: -350, invested: 0, debt: 0, monthly: -30, resilience: -6, risk: 2, msg: 'Improviso é o oposto de governança. E a Receita raramente aprecia criatividade freestyle.', now: '- ajustes/multas', future: '+ risco fiscal' }
+            ]
+        },
+        {
+            phase: 'Mentalidade', month: 21, title: 'Educação financeira',
+            desc: 'Você pode investir R$ 1.200 em formação para tomar decisões melhores.',
+            context: 'O ativo mais assimétrico da carteira continua sendo capacidade decisória.',
+            options: [
+                { text: 'Investir em conhecimento e aplicar um plano revisado.', cash: -1200, invested: 0, debt: 0, monthly: 260, resilience: 12, risk: -2, msg: 'Excelente CAPEX pessoal. Conhecimento bem aplicado aumenta retorno e reduz decisões ruins.', now: '- R$ 1,2 mil', future: '+ R$ 260/mês' },
+                { text: 'Gastar o mesmo valor em consumo pontual.', cash: -1200, invested: 0, debt: 0, monthly: -20, resilience: -5, risk: 1, msg: 'Nada contra viver bem. O problema é quando todo excedente vira memória e nenhum vira patrimônio.', now: '- R$ 1,2 mil', future: 'sem retorno' }
+            ]
+        },
+        {
+            phase: 'Renda passiva', month: 23, title: 'Dividendos e rendimentos',
+            desc: 'Seus investimentos começaram a pagar rendimentos mensais.',
+            context: 'Renda passiva no começo é pequena. O erro é tratá-la como prêmio; o acerto é tratá-la como semente.',
+            options: [
+                { text: 'Reinvestir 100% dos rendimentos.', cash: 0, invested: 900, debt: 0, monthly: 120, resilience: 10, risk: -1, msg: 'Efeito bola de neve ativado. A máquina começa pequena, mas aprende a se alimentar sozinha.', now: '+ reinvestimento', future: '+ juros compostos' },
+                { text: 'Usar tudo para consumo mensal.', cash: 0, invested: 0, debt: 0, monthly: -60, resilience: -5, risk: 1, msg: 'Você colheu cedo demais. A árvore ainda estava tentando virar árvore.', now: '+ consumo', future: '- compostagem' }
+            ]
+        },
+        {
+            phase: 'Imprevisto', month: 25, title: 'Emergência doméstica',
+            desc: 'Um reparo urgente custa R$ 3.200.',
+            context: 'É aqui que a reserva deixa de ser teoria bonita e vira solução prática.',
+            options: [
+                { text: 'Usar parte da reserva e recompor nos próximos meses.', cash: -3200, invested: 0, debt: 0, monthly: -80, resilience: 7, risk: 0, msg: 'Uso correto da reserva. Você absorveu o impacto sem cair em dívida cara.', now: '- R$ 3,2 mil', future: 'sem dívida cara' },
+                { text: 'Parcelar no cartão e preservar o caixa.', cash: 0, invested: 0, debt: 4100, monthly: -390, resilience: -18, risk: 5, msg: 'Preservar caixa criando dívida cara é trocar um problema por um problema com juros.', now: '+ dívida', future: '- R$ 390/mês' }
+            ]
+        },
+        {
+            phase: 'Empreendedorismo', month: 27, title: 'Oportunidade de negócio',
+            desc: 'Um amigo oferece sociedade em um projeto promissor, mas sem números claros.',
+            context: 'Amizade é ativo social. Investimento exige tese, governança e fluxo de caixa.',
+            options: [
+                { text: 'Pedir plano de negócio, projeções e contrato antes de aportar.', cash: 0, invested: 0, debt: 0, monthly: 130, resilience: 8, risk: -2, msg: 'Decisão orientada por dados. Você protegeu capital e relacionamento.', now: 'risco evitado', future: '+ qualidade decisória' },
+                { text: 'Aportar R$ 6 mil pela confiança pessoal.', cash: -6000, invested: 0, debt: 0, monthly: -180, resilience: -14, risk: 4, msg: 'Confiança sem diligência é romantismo financeiro. Bonito no discurso, perigoso no extrato.', now: '- R$ 6 mil', future: '+ incerteza' }
+            ]
+        },
+        {
+            phase: 'Meta', month: 29, title: 'Primeira grande marca',
+            desc: 'Você se aproxima da meta de R$ 50 mil investidos.',
+            context: 'Metas patrimoniais exigem revisão de rota. O plano que leva ao primeiro marco nem sempre leva ao segundo.',
+            options: [
+                { text: 'Revisar alocação, custos, riscos e próximos objetivos.', cash: 0, invested: 0, debt: 0, monthly: 180, resilience: 10, risk: -1, msg: 'Governança patrimonial aplicada. Você transformou meta em sistema.', now: '+ clareza', future: '+ escala' },
+                { text: 'Relaxar, afinal “já está bom”.', cash: 0, invested: 0, debt: 0, monthly: -110, resilience: -8, risk: 2, msg: 'Complacência é uma taxa invisível cobrada de quem para cedo demais.', now: 'sem revisão', future: '- eficiência' }
+            ]
+        },
+        {
+            phase: 'Golpes', month: 31, title: 'Promessa de retorno garantido',
+            desc: 'Oferecem 8% ao mês garantido em uma operação alternativa.',
+            context: 'Quanto maior a promessa de retorno sem risco, maior costuma ser o risco que não estão te contando.',
+            options: [
+                { text: 'Recusar, pesquisar registros e alertar outras pessoas.', cash: 0, invested: 0, debt: 0, monthly: 60, resilience: 10, risk: -3, msg: 'Excelente filtro de risco. Você preservou capital e ainda gerou valor social.', now: 'capital preservado', future: '+ segurança' },
+                { text: 'Colocar R$ 3 mil para testar.', cash: -3000, invested: 0, debt: 0, monthly: -120, resilience: -25, risk: 6, msg: 'Teste caro. Retorno garantido geralmente garante uma coisa: aprendizado doloroso.', now: '- R$ 3 mil', future: '+ risco extremo' }
+            ]
+        },
+        {
+            phase: 'Legado', month: 33, title: 'Planejamento de longo prazo',
+            desc: 'Você começa a pensar em aposentadoria, família e independência financeira.',
+            context: 'Patrimônio maduro não serve apenas para acumular. Serve para dar liberdade, segurança e opções.',
+            options: [
+                { text: 'Criar plano de independência financeira com metas anuais.', cash: 0, invested: 0, debt: 0, monthly: 240, resilience: 14, risk: -2, msg: 'Visão estratégica. Você conectou dinheiro, tempo e propósito em um plano mensurável.', now: '+ plano anual', future: '+ liberdade' },
+                { text: 'Deixar para pensar nisso no futuro.', cash: 0, invested: 0, debt: 0, monthly: -100, resilience: -10, risk: 2, msg: 'O futuro chega parcelado em meses. Ignorar agora aumenta o boleto depois.', now: 'sem ação', future: '+ esforço futuro' }
+            ]
+        },
+        {
+            phase: 'Fechamento', month: 36, title: 'Decisão final',
+            desc: 'Ao final de 36 meses, você precisa escolher como sustentar o crescimento.',
+            context: 'Patrimônio não cresce por evento isolado. Cresce por sistema, consistência e decisões repetidas com qualidade.',
+            options: [
+                { text: 'Automatizar aportes, revisar trimestralmente e manter disciplina.', cash: 0, invested: 1500, debt: 0, monthly: 320, resilience: 16, risk: -2, msg: 'Alta performance financeira. Você criou um sistema que não depende só de motivação.', now: '+ sistema', future: '+ crescimento sustentável' },
+                { text: 'Parar de acompanhar porque já melhorou bastante.', cash: 0, invested: 0, debt: 0, monthly: -140, resilience: -8, risk: 2, msg: 'Melhorar é bom. Sustentar é gestão. Sem acompanhamento, o patrimônio perde cadência.', now: 'sem rotina', future: '- consistência' }
+            ]
+        }
+    ];
+
+    let currentStep = 0;
+    let cash = 13000;
+    let invested = 12000;
+    let debt = 0;
+    let monthlyContribution = 250;
+    let resilience = 70;
+    let riskScore = 5;
+    let totalEarnings = 0;
+    let history = [];
+
+    function netWorth() { return cash + invested - debt; }
+
+    function monthlyReturnRate() {
+        const base = 0.0072;
+        const resilienceBonus = Math.max(-0.002, (resilience - 70) / 10000);
+        const riskPenalty = Math.max(0, riskScore) / 10000;
+        return Math.max(0.0015, base + resilienceBonus - riskPenalty);
+    }
+
+    function compoundPeriod(months = 2) {
+        for (let i = 0; i < months; i++) {
+            const contribution = Math.max(-800, monthlyContribution);
+            if (contribution >= 0) {
+                cash -= contribution;
+                invested += contribution;
+            } else {
+                cash += contribution;
+            }
+
+            const earnings = invested * monthlyReturnRate();
+            invested += earnings;
+            totalEarnings += earnings;
+
+            if (debt > 0) {
+                const debtInterest = debt * 0.019;
+                debt += debtInterest;
+                totalEarnings -= debtInterest;
+            }
+        }
+    }
+
+    function startGame() {
+        document.getElementById('intro-card').classList.add('hidden');
+        document.getElementById('game-play').classList.remove('hidden');
+        document.getElementById('stats-bar').classList.remove('hidden');
+        renderScenario();
+    }
+
+    function renderScenario() {
+        if (currentStep >= scenarios.length) {
+            showEndScreen();
+            return;
+        }
+
+        const s = scenarios[currentStep];
+        document.getElementById('phase-label').innerHTML = `<i class="fa-solid fa-layer-group"></i> ${s.phase}`;
+        document.getElementById('month-label').innerText = `Mês ${s.month}`;
+        document.getElementById('scenario-title').innerText = s.title;
+        document.getElementById('scenario-desc').innerText = s.desc;
+        document.getElementById('scenario-context').innerText = s.context;
+        document.getElementById('progress-text').innerText = `${currentStep + 1}/${scenarios.length}`;
+        document.getElementById('progress-bar').style.width = `${((currentStep + 1) / scenarios.length) * 100}%`;
+
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+
+        s.options.forEach((opt, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn rounded-2xl p-4 md:p-5 text-left';
+            btn.innerHTML = `
+                <div class="flex gap-4 items-start">
+                    <div class="w-9 h-9 rounded-xl ${index === 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'} flex items-center justify-center shrink-0">
+                        <i class="fa-solid ${index === 0 ? 'fa-arrow-trend-up' : 'fa-triangle-exclamation'}"></i>
+                    </div>
+                    <div>
+                        <p class="font-extrabold text-slate-900 text-sm md:text-base leading-snug">${opt.text}</p>
+                        <p class="text-xs md:text-sm text-slate-500 mt-2">Impacta caixa, investimentos, dívidas, aporte mensal e resiliência.</p>
+                    </div>
+                </div>
+            `;
+            btn.onclick = () => handleChoice(opt);
+            container.appendChild(btn);
+        });
+
+        updateStats();
+    }
+
+    function handleChoice(opt) {
+        cash += opt.cash || 0;
+        invested += opt.invested || 0;
+        debt += opt.debt || 0;
+        monthlyContribution += opt.monthly || 0;
+        resilience = Math.min(100, Math.max(0, resilience + (opt.resilience || 0)));
+        riskScore = Math.min(20, Math.max(0, riskScore + (opt.risk || 0)));
+
+        compoundPeriod(2);
+
+        history.push({
+            step: currentStep + 1,
+            title: scenarios[currentStep].title,
+            net: netWorth(),
+            invested,
+            debt,
+            monthlyContribution,
+            resilience
+        });
+
+        const positive = (opt.resilience || 0) >= 0 && (opt.monthly || 0) >= -150 && (opt.debt || 0) <= 0;
+        document.getElementById('modal-title').innerText = scenarios[currentStep].title;
+        document.getElementById('modal-text').innerText = opt.msg;
+        document.getElementById('modal-now').innerText = opt.now;
+        document.getElementById('modal-future').innerText = opt.future;
+        document.getElementById('modal-icon').innerHTML = positive
+            ? '<i class="fa-solid fa-circle-check text-emerald-600"></i>'
+            : '<i class="fa-solid fa-triangle-exclamation text-amber-500"></i>';
+        document.getElementById('modal').classList.remove('hidden');
+        updateStats();
+    }
+
+    function closeModal() {
+        document.getElementById('modal').classList.add('hidden');
+        currentStep++;
+        renderScenario();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function updateStats() {
+        const net = netWorth();
+        document.getElementById('balance').innerText = formatCurrency(net);
+        document.getElementById('invested').innerText = formatCurrency(invested);
+        document.getElementById('debt').innerText = formatCurrency(debt);
+
+        const debtEl = document.getElementById('debt');
+        debtEl.className = debt > 0
+            ? 'stat-value text-sm md:text-lg font-extrabold text-red-600'
+            : 'stat-value text-sm md:text-lg font-extrabold text-emerald-700';
+    }
+
+    function classifyInvestor(finalNet) {
+        if (finalNet >= 85000 && resilience >= 80 && debt < 1000) return {
+            title: 'Arquiteto Patrimonial', icon: '🏛️', tone: 'text-emerald-700',
+            message: 'Você construiu um sistema robusto: aportes consistentes, risco controlado, dívidas sob controle e crescimento sustentável.'
+        };
+        if (finalNet >= 60000 && resilience >= 60) return {
+            title: 'Investidor em Escala', icon: '🚀', tone: 'text-blue-900',
+            message: 'Sua trajetória é positiva e já mostra consistência. O próximo salto está em aumentar disciplina, diversificação e previsibilidade.'
+        };
+        if (finalNet >= 35000) return {
+            title: 'Construtor de Base', icon: '🧱', tone: 'text-amber-700',
+            message: 'Você evoluiu, mas ainda existem vazamentos de caixa, concentração de risco ou decisões que atrasaram a curva patrimonial.'
+        };
+        return {
+            title: 'Modo Reestruturação', icon: '🛠️', tone: 'text-red-600',
+            message: 'Sua jornada indica necessidade de reorganização: reduzir dívidas, recompor reserva e automatizar aportes deve ser prioridade.'
+        };
+    }
+
+    function showEndScreen() {
+        const finalNet = netWorth();
+        const initialNet = 25000;
+        const growth = finalNet - initialNet;
+        const growthPct = ((growth / initialNet) * 100);
+        const profile = classifyInvestor(finalNet);
+        const projected12m = finalNet + (Math.max(0, monthlyContribution) * 12) + (invested * monthlyReturnRate() * 12) - (debt * 0.019 * 12);
+
+        document.getElementById('game-play').innerHTML = `
+            <div class="text-center py-3 md:py-6">
+                <div class="text-6xl mb-4">${profile.icon}</div>
+                <p class="text-[11px] font-extrabold uppercase tracking-[.22em] text-slate-400 mb-2">Resultado da jornada</p>
+                <h2 class="text-3xl md:text-4xl font-extrabold ${profile.tone} mb-3">${profile.title}</h2>
+                <p class="text-slate-600 max-w-2xl mx-auto leading-relaxed mb-8">${profile.message}</p>
+
+                <div class="result-grid my-8 text-left">
+                    <div class="metric-card rounded-3xl p-5">
+                        <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Patrimônio inicial</p>
+                        <p class="text-2xl font-extrabold text-slate-950 mt-1">${formatCurrency(initialNet)}</p>
+                    </div>
+                    <div class="metric-card rounded-3xl p-5">
+                        <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Patrimônio final</p>
+                        <p class="text-2xl font-extrabold text-blue-950 mt-1">${formatCurrency(finalNet)}</p>
+                    </div>
+                    <div class="metric-card rounded-3xl p-5">
+                        <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Crescimento líquido</p>
+                        <p class="text-2xl font-extrabold ${growth >= 0 ? 'text-emerald-700' : 'text-red-600'} mt-1">${formatCurrency(growth)}</p>
+                        <p class="text-xs text-slate-500 mt-1">${growthPct.toFixed(1).replace('.', ',')}% em 36 meses</p>
+                    </div>
+                    <div class="metric-card rounded-3xl p-5">
+                        <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Projeção próximos 12 meses</p>
+                        <p class="text-2xl font-extrabold text-emerald-700 mt-1">${formatCurrency(projected12m)}</p>
+                        <p class="text-xs text-slate-500 mt-1">Mantendo a cadência atual</p>
+                    </div>
+                    <div class="metric-card rounded-3xl p-5">
+                        <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Investimentos acumulados</p>
+                        <p class="text-2xl font-extrabold text-emerald-700 mt-1">${formatCurrency(invested)}</p>
+                    </div>
+                    <div class="metric-card rounded-3xl p-5">
+                        <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Dívida estimada</p>
+                        <p class="text-2xl font-extrabold ${debt > 0 ? 'text-red-600' : 'text-emerald-700'} mt-1">${formatCurrency(debt)}</p>
+                    </div>
+                </div>
+
+                <div class="bg-blue-950 text-white rounded-[2rem] p-6 text-left mb-7">
+                    <p class="text-gold text-[11px] uppercase font-extrabold tracking-[.2em] mb-3">Diagnóstico Santinvest</p>
+                    <h3 class="text-xl font-extrabold mb-3">Seu patrimônio cresceu quando três alavancas trabalharam juntas:</h3>
+                    <div class="grid md:grid-cols-3 gap-4 text-sm text-slate-200">
+                        <div><strong class="text-white">1. Aporte recorrente:</strong> transformar renda disponível em investimento automático.</div>
+                        <div><strong class="text-white">2. Controle de dívida:</strong> impedir que juros compostos atuem contra você.</div>
+                        <div><strong class="text-white">3. Proteção:</strong> manter reserva e diversificação para atravessar imprevistos.</div>
+                    </div>
+                </div>
+
+                <button onclick="location.reload()" class="btn-gold text-white w-full md:w-auto px-10 py-4 rounded-full font-extrabold shadow-xl">
+                    Refazer simulação
+                </button>
+            </div>
+        `;
+        updateStats();
+    }
+</script>
+</body>
+</html>
