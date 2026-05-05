@@ -152,63 +152,83 @@
             <div class="absolute -right-16 -top-16 w-56 h-56 rounded-full bg-white/10"></div>
             <div class="absolute -left-20 bottom-0 w-72 h-72 rounded-full bg-gold/10"></div>
 
-            <div class="relative z-10 grid md:grid-cols-[1.1fr_.9fr] gap-8 items-center">
+            <div class="relative z-10 grid md:grid-cols-[1fr_.95fr] gap-8 items-start">
                 <div>
                     <span class="pill bg-white/10 text-gold border border-white/10 mb-5">
-                        <i class="fa-solid fa-seedling"></i> Jornada de patrimônio
+                        <i class="fa-solid fa-seedling"></i> Diagnóstico patrimonial
                     </span>
                     <h1 class="text-3xl md:text-5xl font-extrabold mb-5 leading-tight">
                         Simulador de Crescimento Patrimonial
                     </h1>
                     <p class="text-base md:text-lg text-slate-200 mb-7 leading-relaxed">
-                        Tome decisões financeiras ao longo de 18 etapas e veja como escolhas sobre reserva, crédito,
-                        investimentos, consumo, proteção e disciplina afetam seu patrimônio líquido ao longo do tempo.
+                        Informe sua fotografia financeira atual e veja como suas decisões podem impactar patrimônio líquido,
+                        investimentos, dívidas, aportes e crescimento ao longo do horizonte escolhido.
                     </p>
 
                     <div class="grid grid-cols-3 gap-3 mb-8">
                         <div class="bg-white/10 rounded-2xl p-3 border border-white/10">
-                            <p class="text-[10px] uppercase tracking-wider text-slate-300 font-bold">Início</p>
-                            <p class="font-extrabold text-lg">R$ 25 mil</p>
+                            <p class="text-[10px] uppercase tracking-wider text-slate-300 font-bold">Base</p>
+                            <p class="font-extrabold text-lg">Real</p>
                         </div>
                         <div class="bg-white/10 rounded-2xl p-3 border border-white/10">
                             <p class="text-[10px] uppercase tracking-wider text-slate-300 font-bold">Horizonte</p>
-                            <p class="font-extrabold text-lg">36 meses</p>
+                            <p class="font-extrabold text-lg">Flexível</p>
                         </div>
                         <div class="bg-white/10 rounded-2xl p-3 border border-white/10">
-                            <p class="text-[10px] uppercase tracking-wider text-slate-300 font-bold">Foco</p>
+                            <p class="text-[10px] uppercase tracking-wider text-slate-300 font-bold">Motor</p>
                             <p class="font-extrabold text-lg">Decisão</p>
                         </div>
                     </div>
 
-                    <button onclick="startGame()" class="btn-gold w-full md:w-auto text-white px-10 py-4 rounded-full font-extrabold text-lg shadow-lg">
-                        Iniciar jornada patrimonial
-                    </button>
+                    <div class="bg-white/10 border border-white/10 rounded-3xl p-5 text-sm text-slate-200 leading-relaxed">
+                        <strong class="text-white">Patrimônio líquido</strong> será calculado como:
+                        <span class="text-gold font-extrabold">caixa + investimentos - dívidas</span>.
+                        A partir disso, cada escolha altera a curva de evolução. Sem achismo, sem planilha mística.
+                    </div>
                 </div>
 
                 <div class="glass-card rounded-[1.7rem] p-5 text-slate-900">
-                    <p class="text-xs font-extrabold uppercase tracking-[.18em] text-slate-400 mb-4">Como será calculado</p>
+                    <p class="text-xs font-extrabold uppercase tracking-[.18em] text-slate-400 mb-4">Preencha sua base inicial</p>
+
                     <div class="space-y-4">
-                        <div class="flex gap-3">
-                            <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-900 flex items-center justify-center"><i class="fa-solid fa-wallet"></i></div>
-                            <div>
-                                <p class="font-extrabold">Patrimônio líquido</p>
-                                <p class="text-sm text-slate-500">Caixa + investimentos + rendimentos - dívidas.</p>
-                            </div>
-                        </div>
-                        <div class="flex gap-3">
-                            <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center"><i class="fa-solid fa-arrows-spin"></i></div>
-                            <div>
-                                <p class="font-extrabold">Juros compostos</p>
-                                <p class="text-sm text-slate-500">Boas decisões ampliam os aportes e aceleram a curva.</p>
-                            </div>
-                        </div>
-                        <div class="flex gap-3">
-                            <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center"><i class="fa-solid fa-shield-halved"></i></div>
-                            <div>
-                                <p class="font-extrabold">Resiliência financeira</p>
-                                <p class="text-sm text-slate-500">Reserva, proteção e controle de risco evitam descapitalização.</p>
-                            </div>
-                        </div>
+                        <label class="block">
+                            <span class="text-xs font-extrabold text-slate-500 uppercase">Caixa / reserva disponível</span>
+                            <input id="input-cash" type="number" min="0" value="13000" class="mt-1 w-full rounded-2xl border border-slate-200 px-4 py-3 font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-900" placeholder="Ex.: 13000">
+                        </label>
+
+                        <label class="block">
+                            <span class="text-xs font-extrabold text-slate-500 uppercase">Valor já investido</span>
+                            <input id="input-invested" type="number" min="0" value="12000" class="mt-1 w-full rounded-2xl border border-slate-200 px-4 py-3 font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-900" placeholder="Ex.: 12000">
+                        </label>
+
+                        <label class="block">
+                            <span class="text-xs font-extrabold text-slate-500 uppercase">Dívidas atuais</span>
+                            <input id="input-debt" type="number" min="0" value="0" class="mt-1 w-full rounded-2xl border border-slate-200 px-4 py-3 font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-900" placeholder="Ex.: 5000">
+                        </label>
+
+                        <label class="block">
+                            <span class="text-xs font-extrabold text-slate-500 uppercase">Aporte mensal possível</span>
+                            <input id="input-monthly" type="number" value="250" class="mt-1 w-full rounded-2xl border border-slate-200 px-4 py-3 font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-900" placeholder="Ex.: 500">
+                        </label>
+
+                        <label class="block">
+                            <span class="text-xs font-extrabold text-slate-500 uppercase">Horizonte da simulação</span>
+                            <select id="input-horizon" class="mt-1 w-full rounded-2xl border border-slate-200 px-4 py-3 font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-900">
+                                <option value="12">12 meses</option>
+                                <option value="24">24 meses</option>
+                                <option value="36" selected>36 meses</option>
+                                <option value="60">60 meses</option>
+                                <option value="120">10 anos</option>
+                            </select>
+                        </label>
+
+                        <button onclick="startGame()" class="btn-gold w-full text-white px-10 py-4 rounded-full font-extrabold text-lg shadow-lg mt-2">
+                            Iniciar simulação personalizada
+                        </button>
+
+                        <p id="input-error" class="hidden text-xs font-bold text-red-600 bg-red-50 border border-red-100 rounded-2xl p-3">
+                            Revise os valores informados. Use números iguais ou maiores que zero para caixa, investimentos e dívidas.
+                        </p>
                     </div>
                 </div>
             </div>
@@ -432,16 +452,44 @@
     ];
 
     let currentStep = 0;
-    let cash = 13000;
-    let invested = 12000;
+    let cash = 0;
+    let invested = 0;
     let debt = 0;
-    let monthlyContribution = 250;
+    let monthlyContribution = 0;
+    let horizonMonths = 36;
+    let initialNetWorth = 0;
+    let initialInvested = 0;
+    let initialDebt = 0;
+    let initialCash = 0;
+    let initialMonthlyContribution = 0;
     let resilience = 70;
     let riskScore = 5;
     let totalEarnings = 0;
     let history = [];
 
     function netWorth() { return cash + invested - debt; }
+
+    function clamp(value, min, max) {
+        return Math.min(max, Math.max(min, value));
+    }
+
+    function moneyScale() {
+        const base = Math.max(5000, Math.abs(initialNetWorth || 25000));
+        return clamp(base / 25000, 0.25, 8);
+    }
+
+    function monthlyScale() {
+        const baseMonthly = Math.max(250, Math.abs(initialMonthlyContribution || 250));
+        return clamp(baseMonthly / 250, 0.5, 6);
+    }
+
+    function scaledMoney(value) {
+        return Math.round((value || 0) * moneyScale());
+    }
+
+    function scaledMonthly(value) {
+        return Math.round((value || 0) * monthlyScale());
+    }
 
     function monthlyReturnRate() {
         const base = 0.0072;
@@ -450,14 +498,29 @@
         return Math.max(0.0015, base + resilienceBonus - riskPenalty);
     }
 
-    function compoundPeriod(months = 2) {
+    function compoundPeriod(months = Math.max(1, Math.round(horizonMonths / scenarios.length))) {
         for (let i = 0; i < months; i++) {
-            const contribution = Math.max(-800, monthlyContribution);
-            if (contribution >= 0) {
-                cash -= contribution;
-                invested += contribution;
-            } else {
-                cash += contribution;
+            const contribution = monthlyContribution;
+
+            if (contribution > 0) {
+                if (debt > 0) {
+                    const debtPayment = Math.min(debt, contribution * 0.7);
+                    debt -= debtPayment;
+                    invested += contribution - debtPayment;
+                } else {
+                    invested += contribution;
+                }
+            }
+
+            if (contribution < 0) {
+                const deficit = Math.abs(contribution);
+                if (cash >= deficit) {
+                    cash -= deficit;
+                } else {
+                    const uncovered = deficit - Math.max(0, cash);
+                    cash = 0;
+                    debt += uncovered;
+                }
             }
 
             const earnings = invested * monthlyReturnRate();
@@ -472,11 +535,85 @@
         }
     }
 
+    function readInputNumber(id) {
+        const value = Number(document.getElementById(id).value);
+        return Number.isFinite(value) ? value : NaN;
+    }
+
     function startGame() {
+        const inputCash = readInputNumber('input-cash');
+        const inputInvested = readInputNumber('input-invested');
+        const inputDebt = readInputNumber('input-debt');
+        const inputMonthly = readInputNumber('input-monthly');
+        const inputHorizon = Number(document.getElementById('input-horizon').value);
+        const errorEl = document.getElementById('input-error');
+
+        if (
+            !Number.isFinite(inputCash) || inputCash < 0 ||
+            !Number.isFinite(inputInvested) || inputInvested < 0 ||
+            !Number.isFinite(inputDebt) || inputDebt < 0 ||
+            !Number.isFinite(inputMonthly) ||
+            !Number.isFinite(inputHorizon) || inputHorizon <= 0
+        ) {
+            errorEl.classList.remove('hidden');
+            return;
+        }
+
+        errorEl.classList.add('hidden');
+
+        cash = inputCash;
+        invested = inputInvested;
+        debt = inputDebt;
+        monthlyContribution = inputMonthly;
+        horizonMonths = inputHorizon;
+        initialCash = cash;
+        initialInvested = invested;
+        initialDebt = debt;
+        initialMonthlyContribution = monthlyContribution;
+        initialNetWorth = netWorth();
+
+        resilience = calculateInitialResilience();
+        riskScore = calculateInitialRisk();
+        totalEarnings = 0;
+        history = [];
+        currentStep = 0;
+
+        applyScenarioMonths();
+
         document.getElementById('intro-card').classList.add('hidden');
         document.getElementById('game-play').classList.remove('hidden');
         document.getElementById('stats-bar').classList.remove('hidden');
         renderScenario();
+    }
+
+    function calculateInitialResilience() {
+        const monthlyBase = Math.max(1, Math.abs(monthlyContribution));
+        const reserveMonths = cash / monthlyBase;
+        let score = 55;
+        if (cash > 0) score += 10;
+        if (invested > 0) score += 10;
+        if (reserveMonths >= 6) score += 15;
+        if (debt > Math.max(1, netWorth()) * 0.4) score -= 20;
+        if (monthlyContribution > 0) score += 10;
+        if (monthlyContribution < 0) score -= 15;
+        return Math.min(100, Math.max(0, score));
+    }
+
+    function calculateInitialRisk() {
+        let score = 5;
+        if (debt > 0) score += 3;
+        if (debt > (cash + invested) * 0.5) score += 4;
+        if (cash <= 0) score += 3;
+        if (invested <= 0) score += 2;
+        if (monthlyContribution < 0) score += 3;
+        return Math.min(20, Math.max(0, score));
+    }
+
+    function applyScenarioMonths() {
+        scenarios.forEach((scenario, index) => {
+            const proportionalMonth = Math.round(((index + 1) / scenarios.length) * horizonMonths);
+            scenario.month = Math.max(1, proportionalMonth);
+        });
     }
 
     function renderScenario() {
@@ -519,10 +656,10 @@
     }
 
     function handleChoice(opt) {
-        cash += opt.cash || 0;
-        invested += opt.invested || 0;
-        debt += opt.debt || 0;
-        monthlyContribution += opt.monthly || 0;
+        cash += scaledMoney(opt.cash);
+        invested += scaledMoney(opt.invested);
+        debt += scaledMoney(opt.debt);
+        monthlyContribution += scaledMonthly(opt.monthly);
         resilience = Math.min(100, Math.max(0, resilience + (opt.resilience || 0)));
         riskScore = Math.min(20, Math.max(0, riskScore + (opt.risk || 0)));
 
@@ -570,17 +707,21 @@
     }
 
     function classifyInvestor(finalNet) {
-        if (finalNet >= 85000 && resilience >= 80 && debt < 1000) return {
+        const initial = Math.max(1, initialNetWorth);
+        const growthPct = ((finalNet - initialNetWorth) / initial) * 100;
+        const debtRatio = debt / Math.max(1, cash + invested);
+
+        if (growthPct >= 70 && resilience >= 80 && debtRatio < 0.08) return {
             title: 'Arquiteto Patrimonial', icon: '🏛️', tone: 'text-emerald-700',
             message: 'Você construiu um sistema robusto: aportes consistentes, risco controlado, dívidas sob controle e crescimento sustentável.'
         };
-        if (finalNet >= 60000 && resilience >= 60) return {
+        if (growthPct >= 30 && resilience >= 60 && debtRatio < 0.25) return {
             title: 'Investidor em Escala', icon: '🚀', tone: 'text-blue-900',
             message: 'Sua trajetória é positiva e já mostra consistência. O próximo salto está em aumentar disciplina, diversificação e previsibilidade.'
         };
-        if (finalNet >= 35000) return {
+        if (growthPct >= 0 || debtRatio < 0.45) return {
             title: 'Construtor de Base', icon: '🧱', tone: 'text-amber-700',
-            message: 'Você evoluiu, mas ainda existem vazamentos de caixa, concentração de risco ou decisões que atrasaram a curva patrimonial.'
+            message: 'Você evoluiu em parte da jornada, mas ainda existem vazamentos de caixa, concentração de risco ou decisões que atrasaram a curva patrimonial.'
         };
         return {
             title: 'Modo Reestruturação', icon: '🛠️', tone: 'text-red-600',
@@ -590,11 +731,12 @@
 
     function showEndScreen() {
         const finalNet = netWorth();
-        const initialNet = 25000;
+        const initialNet = initialNetWorth;
         const growth = finalNet - initialNet;
-        const growthPct = ((growth / initialNet) * 100);
+        const growthPct = initialNet === 0 ? 0 : ((growth / Math.max(1, Math.abs(initialNet))) * 100);
         const profile = classifyInvestor(finalNet);
-        const projected12m = finalNet + (Math.max(0, monthlyContribution) * 12) + (invested * monthlyReturnRate() * 12) - (debt * 0.019 * 12);
+        const projectionWindow = Math.min(12, Math.max(6, Math.round(horizonMonths / 3)));
+        const projected12m = finalNet + (Math.max(0, monthlyContribution) * projectionWindow) + (invested * monthlyReturnRate() * projectionWindow) - (debt * 0.019 * projectionWindow);
 
         document.getElementById('game-play').innerHTML = `
             <div class="text-center py-3 md:py-6">
@@ -607,6 +749,7 @@
                     <div class="metric-card rounded-3xl p-5">
                         <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Patrimônio inicial</p>
                         <p class="text-2xl font-extrabold text-slate-950 mt-1">${formatCurrency(initialNet)}</p>
+                        <p class="text-xs text-slate-500 mt-1">Caixa ${formatCurrency(initialCash)} + investimentos ${formatCurrency(initialInvested)} - dívidas ${formatCurrency(initialDebt)}</p>
                     </div>
                     <div class="metric-card rounded-3xl p-5">
                         <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Patrimônio final</p>
@@ -615,12 +758,12 @@
                     <div class="metric-card rounded-3xl p-5">
                         <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Crescimento líquido</p>
                         <p class="text-2xl font-extrabold ${growth >= 0 ? 'text-emerald-700' : 'text-red-600'} mt-1">${formatCurrency(growth)}</p>
-                        <p class="text-xs text-slate-500 mt-1">${growthPct.toFixed(1).replace('.', ',')}% em 36 meses</p>
+                        <p class="text-xs text-slate-500 mt-1">${growthPct.toFixed(1).replace('.', ',')}% em ${horizonMonths} meses</p>
                     </div>
                     <div class="metric-card rounded-3xl p-5">
                         <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Projeção próximos 12 meses</p>
                         <p class="text-2xl font-extrabold text-emerald-700 mt-1">${formatCurrency(projected12m)}</p>
-                        <p class="text-xs text-slate-500 mt-1">Mantendo a cadência atual</p>
+                        <p class="text-xs text-slate-500 mt-1">Mantendo a cadência atual por ${projectionWindow} meses</p>
                     </div>
                     <div class="metric-card rounded-3xl p-5">
                         <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Investimentos acumulados</p>
